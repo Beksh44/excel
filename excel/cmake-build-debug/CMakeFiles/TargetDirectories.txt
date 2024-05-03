@@ -1,0 +1,3 @@
+/Users/beksh/fit/pa2/omirzbek/excel/cmake-build-debug/CMakeFiles/excel.dir
+/Users/beksh/fit/pa2/omirzbek/excel/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/beksh/fit/pa2/omirzbek/excel/cmake-build-debug/CMakeFiles/rebuild_cache.dir
