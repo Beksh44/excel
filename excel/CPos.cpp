@@ -1,3 +1,6 @@
-//
-// Created by Bekzhan Omirzak on 03.05.2024.
-//
+#include "CPos.h"
+#include <string>
+
+CPos::CPos ( std::string_view str ) {
+
+}
