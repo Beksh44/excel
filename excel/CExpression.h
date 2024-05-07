@@ -1,39 +1,81 @@
-//#include "expression.h"
-#pragma once
+#ifndef CEXPRESSION_H
+#define CEXPRESSION_H
 #include <memory>
+#include <variant>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 #include "CPos.h"
+
+using CValue = std::variant<std::monostate, double, std::string>;
 
 class CExpression {
 public:
     virtual std::shared_ptr<CExpression> clone() const = 0;
 
     virtual void print () const = 0;
-    
+
+    virtual CValue getValue() = 0;
+
+    virtual bool isDouble() const = 0;
+
+    virtual bool isString() const = 0;
+
+    virtual bool isPos() const = 0;
+
+    virtual bool isOperator() const = 0;
+
+    virtual bool isMonostate() const = 0;
 };
 
 class COperator : public CExpression {
-
 public:
     COperator();
-    COperator ( const char & operaTor );
+    COperator ( const std::string & operaTor );
 
     std::shared_ptr<CExpression> clone() const override;
 
+    CValue getValue() override;
+
     void print () const override;
 
+    bool isDouble() const override;
+
+    bool isString() const override;
+
+    bool isPos() const override;
+
+    bool isOperator() const override;
+
+    bool isMonostate() const override;
+
 private:
-    char m_oper;
+    std::string m_oper;
 };
 
 class CPosition : public CExpression {
 
 public:
 
-    CPosition( CPos pos );
+    CPosition ( CPos & pos );
 
     std::shared_ptr<CExpression> clone() const override;
 
+    CValue getValue() override;
+
     void print () const override;
+
+    bool isOperator() const override;
+
+    bool isDouble() const override;
+
+    bool isString() const override;
+
+    bool isPos() const override;
+
+    bool isMonostate() const override;
+
 private:
     CPos m_pos;
 };
@@ -47,10 +89,21 @@ public:
 
     std::shared_ptr<CExpression> clone() const override;
 
+    CValue getValue() override;
+
     void print () const override;
 
+    bool isOperator() const override;
+
+    bool isDouble() const override;
+
+    bool isString() const override;
+
+    bool isPos() const override;
+
+    bool isMonostate() const override;
 private:
-    double number;
+    double m_number;
 };
 
 class CString : public CExpression {
@@ -60,8 +113,21 @@ public:
 
     std::shared_ptr<CExpression> clone() const override;
 
+    CValue getValue() override;
+
     void print () const override;
 
+    bool isOperator() const override;
+
+    bool isDouble() const override;
+
+    bool isString() const override;
+
+    bool isPos() const override;
+
+    bool isMonostate() const override;
 private:
     std::string m_str;
 };
+
+#endif CEXPRESSION_H
