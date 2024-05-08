@@ -17,7 +17,7 @@ void COperator::print() const {
     std::cout << " operator " << std::endl;
 }
 
-CValue COperator::getValue() {
+CValue2 COperator::getValue() {
     return m_oper;
 }
 
@@ -57,7 +57,7 @@ std::shared_ptr<CExpression> CDouble::clone ( ) const {
     return std::make_shared<CDouble>( *this );
 }
 
-CValue CDouble::getValue() {
+CValue2 CDouble::getValue() {
     return m_number;
 }
 
@@ -95,7 +95,7 @@ void CString::print () const {
     std::cout << "jo2" << std::endl;
 }
 
-CValue CString::getValue() {
+CValue2 CString::getValue() {
     return m_str;
 }
 
@@ -133,8 +133,8 @@ void CPosition::print () const {
     std::cout << "jo3" << std::endl;
 }
 
-CValue CPosition::getValue() {
-    return m_pos.getPosStr();
+CValue2 CPosition::getValue() {
+    return m_pos;
 }
 
 bool CPosition::isPos() const {

@@ -9,6 +9,7 @@
 #include "CPos.h"
 
 using CValue = std::variant<std::monostate, double, std::string>;
+using CValue2 = std::variant<std::monostate, double, std::string,CPos>;
 
 class CExpression {
 public:
@@ -16,7 +17,7 @@ public:
 
     virtual void print () const = 0;
 
-    virtual CValue getValue() = 0;
+    virtual CValue2 getValue() = 0;
 
     virtual bool isDouble() const = 0;
 
@@ -36,7 +37,7 @@ public:
 
     std::shared_ptr<CExpression> clone() const override;
 
-    CValue getValue() override;
+    CValue2 getValue() override;
 
     void print () const override;
 
@@ -62,7 +63,7 @@ public:
 
     std::shared_ptr<CExpression> clone() const override;
 
-    CValue getValue() override;
+    CValue2 getValue() override;
 
     void print () const override;
 
@@ -89,7 +90,7 @@ public:
 
     std::shared_ptr<CExpression> clone() const override;
 
-    CValue getValue() override;
+    CValue2 getValue() override;
 
     void print () const override;
 
@@ -113,7 +114,7 @@ public:
 
     std::shared_ptr<CExpression> clone() const override;
 
-    CValue getValue() override;
+    CValue2 getValue() override;
 
     void print () const override;
 
