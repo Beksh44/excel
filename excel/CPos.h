@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #ifndef CPOS_H
 #define CPOS_H
 
@@ -13,7 +14,9 @@ public:
     bool isFixedColumn() const;
     bool isFixedRow() const;
     void setFixedColumn ( bool toSet );
-    void setVixedRow ( bool toSet );
+    void setFixedRow ( bool toSet );
+    void serialize ( std::ostream & out ) const;
+    bool deSerialize ( std::istream & in );
 
 private:
     std::string m_str;

@@ -83,6 +83,34 @@ void CPos::setFixedColumn ( bool toSet ) {
     m_fixedColumn = toSet;
 }
 
-void CPos::setVixedRow ( bool toSet ) {
+void CPos::setFixedRow ( bool toSet ) {
     m_fixedRow = toSet;
+}
+
+void CPos::serialize ( std::ostream & out ) const {
+    size_t size = m_str.size();
+    out.write ( reinterpret_cast< const char * > ( & size ) , sizeof ( size ) );
+    out.write ( m_str.data() , m_str.size() );
+    out.write ( reinterpret_cast< const char * > ( & m_fixedColumn ) , sizeof ( m_fixedColumn ) );
+    out.write ( reinterpret_cast< const char * > ( & m_fixedRow ) , sizeof ( m_fixedRow ) );
+    out.write ( reinterpret_cast< const char * > ( & m_int ) , sizeof ( m_int ) );
+}
+
+bool CPos::deSerialize ( std::istream & in ) {
+    size_t size;
+    if ( ! in.read ( reinterpret_cast<char*> ( & size ), sizeof ( size ) ) ) {
+        return false;
+    }
+    m_str.resize ( size );
+    if ( ! in.read ( & m_str[0], size ) ) {
+        return false;
+    }
+
+    if ( ! in.read ( reinterpret_cast< char * >( & m_fixedColumn ), sizeof ( m_fixedColumn ) ) )
+        return false;
+    if ( ! in.read ( reinterpret_cast< char * >( & m_fixedRow ), sizeof ( m_fixedRow ) ) )
+        return false;
+    if ( ! in.read ( reinterpret_cast< char * >( & m_int ), sizeof ( m_int ) ) )
+        return false;
+    return true;
 }

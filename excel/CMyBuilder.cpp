@@ -2,8 +2,7 @@
 #include <string>
 #include "CMyBuilder.h"
 
-CMyBuilder::CMyBuilder(){
-}
+CMyBuilder::CMyBuilder() = default;
 
 void CMyBuilder::opAdd() {
     std::cout << " + " << std::endl;

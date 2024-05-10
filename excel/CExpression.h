@@ -28,6 +28,12 @@ public:
     virtual bool isOperator() const = 0;
 
     virtual bool isMonostate() const = 0;
+
+    virtual void serialize ( std::ostream& os ) const = 0;
+
+    virtual bool deSerialize ( std::istream& is ) = 0;
+
+    virtual std::string getType() const = 0;
 };
 
 class COperator : public CExpression {
@@ -51,6 +57,12 @@ public:
 
     bool isMonostate() const override;
 
+    void serialize ( std::ostream& os ) const override;
+
+    bool deSerialize ( std::istream& is ) override;
+
+    std::string getType() const;
+
 private:
     std::string m_oper;
 };
@@ -58,6 +70,8 @@ private:
 class CPosition : public CExpression {
 
 public:
+
+    CPosition();
 
     CPosition ( CPos & pos );
 
@@ -77,6 +91,11 @@ public:
 
     bool isMonostate() const override;
 
+    void serialize ( std::ostream& os ) const override;
+
+    bool deSerialize ( std::istream& is ) override;
+
+    std::string getType() const;
 private:
     CPos m_pos;
 };
@@ -84,6 +103,9 @@ private:
 class CDouble : public CExpression {
 
 public:
+
+    CDouble();
+
     CDouble ( double value );
 
     CDouble ( const CDouble & other );
@@ -103,6 +125,12 @@ public:
     bool isPos() const override;
 
     bool isMonostate() const override;
+
+    void serialize ( std::ostream& os ) const override;
+
+    bool deSerialize ( std::istream& is ) override;
+
+    std::string getType() const;
 private:
     double m_number;
 };
@@ -110,6 +138,8 @@ private:
 class CString : public CExpression {
 
 public:
+    CString();
+
     CString ( const std::string & str );
 
     std::shared_ptr<CExpression> clone() const override;
@@ -127,6 +157,12 @@ public:
     bool isPos() const override;
 
     bool isMonostate() const override;
+
+    void serialize ( std::ostream& os ) const override;
+
+    bool deSerialize ( std::istream& is ) override;
+
+    std::string getType() const;
 private:
     std::string m_str;
 };

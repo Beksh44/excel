@@ -41,7 +41,29 @@ bool COperator::isMonostate() const {
     return false;
 }
 
+std::string COperator::getType() const {
+    return "COperator";
+}
+
+void COperator::serialize ( std::ostream & out ) const {
+    size_t size = m_oper.size();
+    out.write ( reinterpret_cast< const char * > ( & size ) , sizeof ( size ) );
+    out.write ( m_oper.data() , size );
+}
+
+bool COperator::deSerialize ( std::istream & in ) {
+    size_t size;
+    if ( !in.read ( reinterpret_cast<char*> ( & size ), sizeof ( size ) ) ) {
+        return false;
+    }
+    m_oper.resize ( size );
+    in.read ( & m_oper [ 0 ], size );
+    return true;
+}
+
 /////////////////////////////////////////////////CDouble
+
+CDouble::CDouble() = default;
 
 CDouble::CDouble ( double value ) : m_number ( value ) {}
 
@@ -81,7 +103,24 @@ bool CDouble::isMonostate() const {
     return false;
 }
 
+std::string CDouble::getType() const {
+    return "CDouble";
+}
+
+void CDouble::serialize ( std::ostream& out ) const {
+    out.write ( reinterpret_cast< const char * > ( & m_number ), sizeof ( m_number ) );
+}
+
+bool CDouble::deSerialize ( std::istream & in ) {
+    if ( ! in.read ( reinterpret_cast< char * > ( & m_number ) , sizeof ( m_number ) ) ) {
+        return false;
+    }
+    return true;
+}
+
 /////////////////////////////////////////////////CString
+
+CString::CString() = default;
 
 CString::CString ( const std::string & str )  {
     m_str = str;
@@ -119,7 +158,31 @@ bool CString::isMonostate() const {
     return false;
 }
 
+std::string CString::getType() const {
+    return "CString";
+}
+
+void CString::serialize ( std::ostream & out ) const {
+    size_t size = m_str.size();
+    out.write ( reinterpret_cast< const char * > ( & size ) , sizeof ( size ) );
+    out.write ( m_str.data(), size );
+}
+
+bool CString::deSerialize ( std::istream & in ) {
+    size_t size;
+    if ( ! in.read ( reinterpret_cast<char*> ( & size ), sizeof ( size ) ) ) {
+        return false;
+    }
+    m_str.resize ( size );
+    if ( ! in.read ( & m_str[0], size ) ) {
+        return false;
+    }
+    return true;
+}
+
 /////////////////////////////////////////////////CPosition
+
+CPosition::CPosition() = default;
 
 CPosition::CPosition ( CPos & pos ) {
     m_pos = pos;
@@ -155,4 +218,16 @@ bool CPosition::isString() const {
 
 bool CPosition::isMonostate() const {
 
+}
+
+std::string CPosition::getType() const {
+    return "CPosition";
+}
+
+void CPosition::serialize ( std::ostream & out ) const {
+    m_pos.serialize( out );
+}
+
+bool CPosition::deSerialize ( std::istream & in ) {
+    return m_pos .deSerialize( in );
 }
