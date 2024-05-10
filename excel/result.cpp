@@ -694,72 +694,6 @@ CValue ge ( const CValue & left , const CValue & right ) {
 }
 
 
-CValue getVal ( const CPos & pos , std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> & m_data ) {
-
-    if ( ! m_data.contains ( pos.getPosStr() ) )//if there is nothing at this position
-        return std::monostate();
-
-
-
-    std::vector<std::shared_ptr<CExpression>> * expression = &m_data [ pos.getPosStr() ];
-    std::stack<CValue> myStack;
-    CValue tmpVal;
-    for ( const auto & it : ( * expression ) ) {
-        if ( ( it ) -> isPos() ) {
-            if ( ! m_data.contains ( ( std::get< CPos >( it->getValue() ) ) .getPosStr() ) )
-                return std::monostate();
-        }
-        if ( ( * it ).isOperator() ) {
-            std::string str = std::get<std::string>( ( * it ).getValue() );
-            if ( str != "unar" ) {//if it is binary operator
-                CValue right = myStack.top();
-                myStack.pop();
-                CValue left = myStack.top();
-                myStack.pop();
-                if ( str == "+" )
-                    tmpVal = add ( left , right );
-                else if ( str == "-" )
-                    tmpVal = sub ( left , right );
-                else if ( str == "*" )
-                    tmpVal = mul ( left , right );
-                else if ( str == "/" )
-                    tmpVal = div ( left , right );
-                else if ( str == "^" )
-                    tmpVal = pow ( left , right );
-                else if ( str == "==" )
-                    tmpVal = eq ( left , right );
-                else if ( str == "!=" )
-                    tmpVal = ne ( left , right );
-                else if ( str == "<" )
-                    tmpVal = lt ( left , right );
-                else if ( str == "<=" )
-                    tmpVal = le ( left , right );
-                else if ( str == ">" )
-                    tmpVal = gt ( left , right );
-                else if ( str == ">=" )
-                    tmpVal = ge ( left , right );
-            } else {
-                CValue value = myStack.top();
-                myStack.pop();
-                tmpVal = unaryMinus ( value );
-            }
-        } else {
-            if ( ( * it ) . isPos() )
-                tmpVal = getVal ( std::get<CPos>( ( * it ).getValue() )  , m_data );
-            else {
-                if ( ( * it ) . isDouble() )
-                    tmpVal = std::get<double> ( ( * it ) . getValue() );
-                else if ( ( * it ) . isString() )
-                    tmpVal = std::get<std::string> ( ( * it ) . getValue() );
-            }
-        }
-        myStack.push ( tmpVal );
-    }
-
-    return myStack.top();
-}
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class CMyBuilder : public CExprBuilder {
@@ -911,6 +845,38 @@ void CMyBuilder::funcCall ( std::string fnName, int paramCount ) {
 
 }
 
+////////
+
+bool dfs ( const std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> & graph ,
+           const std::string & node,
+           std::unordered_set < std::string > & visited,
+           std::unordered_set < std::string > & currentlyVisiting ) {
+
+    if ( currentlyVisiting.find ( node ) != currentlyVisiting.end() )
+        return true;
+
+
+    if ( visited.find ( node ) != visited.end() )
+         return false;
+
+
+    visited.insert ( node );
+    currentlyVisiting.insert ( node );
+
+    if ( graph.contains ( node ) ) {
+        for ( const auto & neighbor : graph.at ( node ) ) {
+            if ( neighbor -> isPos () ) {
+                if ( dfs ( graph, ( std::get < CPos > ( neighbor -> getValue () ) ).getPosStr(), visited, currentlyVisiting ) )
+                    return true;
+            }
+        }
+    }
+
+    currentlyVisiting.erase ( node );
+
+    return false;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1013,7 +979,71 @@ bool CSpreadsheet::setCell ( CPos pos , std::string contents ) {
 }
 
 CValue CSpreadsheet::getValue ( CPos pos ) {
-    return getVal ( pos , m_data );
+
+    if ( ! m_data.contains ( pos.getPosStr() ) )//if there is nothing at this position
+        return std::monostate();
+
+
+    std::unordered_set < std::string > visited;
+    std::unordered_set < std::string > currentlyVisiting;
+    if ( dfs ( m_data , pos.getPosStr() , visited, currentlyVisiting ) )
+        return std::monostate();
+
+    std::vector<std::shared_ptr<CExpression>> * expression = & m_data [ pos.getPosStr() ];
+    std::stack<CValue> myStack;
+    CValue tmpVal;
+    for ( const auto & it : ( * expression ) ) {
+        if ( ( it ) -> isPos() ) {
+            if ( ! m_data.contains ( ( std::get< CPos >( it->getValue() ) ) .getPosStr() ) )
+                return std::monostate();
+        }
+        if ( ( * it ).isOperator() ) {
+            std::string str = std::get<std::string>( ( * it ).getValue() );
+            if ( str != "unar" ) {//if it is binary operator
+                CValue right = myStack.top();
+                myStack.pop();
+                CValue left = myStack.top();
+                myStack.pop();
+                if ( str == "+" )
+                    tmpVal = add ( left , right );
+                else if ( str == "-" )
+                    tmpVal = sub ( left , right );
+                else if ( str == "*" )
+                    tmpVal = mul ( left , right );
+                else if ( str == "/" )
+                    tmpVal = div ( left , right );
+                else if ( str == "^" )
+                    tmpVal = pow ( left , right );
+                else if ( str == "==" )
+                    tmpVal = eq ( left , right );
+                else if ( str == "!=" )
+                    tmpVal = ne ( left , right );
+                else if ( str == "<" )
+                    tmpVal = lt ( left , right );
+                else if ( str == "<=" )
+                    tmpVal = le ( left , right );
+                else if ( str == ">" )
+                    tmpVal = gt ( left , right );
+                else if ( str == ">=" )
+                    tmpVal = ge ( left , right );
+            } else {
+                CValue value = myStack.top();
+                myStack.pop();
+                tmpVal = unaryMinus ( value );
+            }
+        } else {
+            if ( ( * it ) . isPos() )
+                tmpVal = getValue ( std::get<CPos>( ( * it ).getValue() ) );
+            else {
+                if ( ( * it ) . isDouble() )
+                    tmpVal = std::get<double> ( ( * it ) . getValue() );
+                else if ( ( * it ) . isString() )
+                    tmpVal = std::get<std::string> ( ( * it ) . getValue() );
+            }
+        }
+        myStack.push ( tmpVal );
+    }
+    return myStack.top();
 }
 
 void CSpreadsheet::copyRect ( CPos dst , CPos src , int w , int h ) {
@@ -1163,6 +1193,13 @@ int main ()
     std::ostringstream oss;
     std::istringstream iss;
     std::string data;
+
+//    assert( x0 . setCell ( CPos ( "A1" ), "=A2" ) );
+//    assert( x0 . setCell ( CPos ( "A2" ), "=A1" ) );
+//    assert( valueMatch ( x0.getValue ( CPos ( "A1" ) ) , CValue() ) );
+//    std::cout << "uraaaa" << std::endl;;
+
+
     assert ( x0 . setCell ( CPos ( "A1" ), "10" ) );
     assert ( x0 . setCell ( CPos ( "A2" ), "20.5" ) );
     assert ( x0 . setCell ( CPos ( "A3" ), "3e1" ) );
