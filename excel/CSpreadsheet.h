@@ -4,13 +4,23 @@
 #include <charconv>
 #include <span>
 #include <utility>
+#include <map>
+#ifndef CSPREADSHEET_H
+#define CSPREADSHEET_H
+#pragma once
 
-using namespace std::literals;
+
+#include "CExpression.h"
+#include "CPos.h"
+
+constexpr unsigned SPREADSHEET_CYCLIC_DEPS = 0x01;
+constexpr unsigned SPREADSHEET_FUNCTIONS = 0x02;
+constexpr unsigned SPREADSHEET_FILE_IO = 0x04;
+constexpr unsigned SPREADSHEET_SPEED = 0x08;
+constexpr unsigned SPREADSHEET_PARSER = 0x10;
+
 using CValue = std::variant<std::monostate, double, std::string>;
 
-#include "CPos.h"
-#include "expression.h"
-#include "CStore.h"
 
 class CSpreadsheet {
 public:
@@ -19,7 +29,9 @@ public:
         // | SPREADSHEET_PARSER
     }
 
-    CSpreadsheet() = default;
+    CSpreadsheet();
+
+    CSpreadsheet( const CSpreadsheet & other );
 
     bool load ( std::istream & is );
 
@@ -36,5 +48,7 @@ public:
                     int h = 1 );
 
 private:
-    std::unordered_map <std::string ,CStore> m_data;
+    std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> m_data;
 };
+
+#endif CSPREADSHEET_H
