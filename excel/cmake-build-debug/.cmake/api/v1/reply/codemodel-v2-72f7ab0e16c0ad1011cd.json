@@ -9,7 +9,7 @@
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
-						"string" : "3.27"
+						"string" : "3.26"
 					},
 					"projectIndex" : 0,
 					"source" : ".",
@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "excel::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-excel-Debug-7132f9968945ea3f9486.json",
+					"jsonFile" : "target-excel-Debug-17463d5ec766d43d144f.json",
 					"name" : "excel",
 					"projectIndex" : 0
 				}

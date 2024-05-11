@@ -694,7 +694,7 @@ CValue ge ( const CValue & left , const CValue & right ) {
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////CMyBuilder
 
 class CMyBuilder : public CExprBuilder {
 private:
@@ -845,7 +845,7 @@ void CMyBuilder::funcCall ( std::string fnName, int paramCount ) {
 
 }
 
-////////
+///////////////////////////////////////////////////////////////////////////////////recursive algorithm of dfs
 
 bool dfs ( const std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> & graph ,
            const std::string & node,
@@ -877,9 +877,14 @@ bool dfs ( const std::unordered_map <std::string , std::vector<std::shared_ptr<C
     return false;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////serializing functions
 
-
+/**
+ * @param os
+ * @param str
+ *
+ * This function serializes a string to the output stream
+ */
 void serializeString ( std::ostream & os, const std::string & str ) {
     int length = str.size();
     os.write ( reinterpret_cast < const char * > ( & length ), sizeof ( length ) );
@@ -887,10 +892,24 @@ void serializeString ( std::ostream & os, const std::string & str ) {
 }
 
 
+/**
+ *
+ * @param os
+ * @param value
+ *
+ * This function serializes an integer to the output stream
+ */
 void serializeInt(std::ostream& os, int value ) {
     os.write ( reinterpret_cast < const char * > ( & value ), sizeof ( value ) );
 }
 
+/**
+ *
+ * @param os
+ * @param value
+ *
+ * This function serializes a double to the output stream
+ */
 
 bool deserializeString( std::istream & is, std::string & str ) {
     int size;
@@ -905,6 +924,14 @@ bool deserializeString( std::istream & is, std::string & str ) {
     return true;
 }
 
+/**
+ *
+ * @param is
+ * @param value
+ *
+ * This function serializes an integer to the output stream
+ */
+
 bool deserializeInt ( std::istream & is, int & value ) {
     if ( ! is.read ( reinterpret_cast< char * > ( & value ), sizeof ( value ) ) ) {
         return false; // Error reading integer
@@ -912,6 +939,8 @@ bool deserializeInt ( std::istream & is, int & value ) {
     return true;
 }
 
+
+////////////////////////////////////////////////CSpreadsheet
 class CSpreadsheet {
 public:
     static unsigned capabilities() {
@@ -944,19 +973,6 @@ private:
 };
 CSpreadsheet::CSpreadsheet() = default;
 
-//CSpreadsheet CSpreadsheet::operator = ( CSpreadsheet & other ) {
-//    if ( this != & other ) { // Check for self-assignment
-//        m_data.clear(); // Clear existing data
-//        for ( const auto & pair : other.m_data ) {
-//             const std::string & key = pair.first;
-//             for ( const auto & expr : pair.second ) {
-//                m_data [ key ].push_back ( expr -> clone() );
-//             }
-//        }
-//    }
-//    return *this;
-//}
-
 CSpreadsheet::CSpreadsheet ( const CSpreadsheet & other ) {
     for ( const auto & pair : other.m_data ) {
          const std::string & key = pair.first;
@@ -973,7 +989,6 @@ bool CSpreadsheet::setCell ( CPos pos , std::string contents ) {
     tmp.setPtr ( ptr );
     tmp.setTable ( m_data );
     parseExpression ( contents , tmp );
-    //std::cout << "tmp is " << tmp.
     m_data[ pos.getPosStr() ] = *ptr;
     return true;
 }

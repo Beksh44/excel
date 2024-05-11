@@ -37,59 +37,29 @@
 
 using namespace std::literals;
 using CValue = std::variant<std::monostate, double, std::string>;
-
-constexpr unsigned SPREADSHEET_CYCLIC_DEPS = 0x01;
-constexpr unsigned SPREADSHEET_FUNCTIONS = 0x02;
-constexpr unsigned SPREADSHEET_FILE_IO = 0x04;
-constexpr unsigned SPREADSHEET_SPEED = 0x08;
-constexpr unsigned SPREADSHEET_PARSER = 0x10;
 #endif /* __PROGTEST__ */
 
-#include "CPos.h"
 
-class CSpreadsheet {
-public:
-    static unsigned capabilities() {
-        return SPREADSHEET_CYCLIC_DEPS | SPREADSHEET_FUNCTIONS | SPREADSHEET_FILE_IO | SPREADSHEET_SPEED |
-               SPREADSHEET_PARSER;
-    }
 
-    CSpreadsheet();
+#include "CSpreadsheet.h"
 
-    bool load(std::istream &is);
-
-    bool save(std::ostream &os) const;
-
-    bool setCell(CPos pos,
-                 std::string contents);
-
-    CValue getValue(CPos pos);
-
-    void copyRect(CPos dst,
-                  CPos src,
-                  int w = 1,
-                  int h = 1);
-
-private:
-    // todo
-};
 
 #ifndef __PROGTEST__
 
-bool valueMatch(const CValue &r,
-                const CValue &s) {
-    if (r.index() != s.index())
+bool valueMatch ( const CValue & r,
+                  const CValue & s ) {
+    if ( r.index() != s.index () )
         return false;
-    if (r.index() == 0)
+    if ( r.index() == 0 )
         return true;
-    if (r.index() == 2)
-        return std::get<std::string>(r) == std::get<std::string>(s);
-    if (std::isnan(std::get<double>(r)) && std::isnan(std::get<double>(s)))
+    if ( r.index() == 2 )
+        return std::get<std::string> ( r ) == std::get<std::string> ( s );
+    if ( std::isnan ( std::get<double> ( r ) ) && std::isnan ( std::get<double> ( s ) ) )
         return true;
-    if (std::isinf(std::get<double>(r)) && std::isinf(std::get<double>(s)))
-        return (std::get<double>(r) < 0 && std::get<double>(s) < 0)
-               || (std::get<double>(r) > 0 && std::get<double>(s) > 0);
-    return fabs(std::get<double>(r) - std::get<double>(s)) <= 1e8 * DBL_EPSILON * fabs(std::get<double>(r));
+    if ( std::isinf ( std::get<double> ( r ) ) && std::isinf ( std::get<double> ( s ) ) )
+        return ( std::get<double>( r ) < 0 && std::get<double> ( s ) < 0 )
+               || ( std::get<double>( r ) > 0 && std::get<double> ( s ) > 0 );
+    return fabs ( std::get<double>( r ) - std::get<double>( s ) ) <= 1e8 * DBL_EPSILON * fabs ( std::get<double>( r ) );
 }
 
 int main() {
@@ -97,6 +67,7 @@ int main() {
     std::ostringstream oss;
     std::istringstream iss;
     std::string data;
+
     assert (x0.setCell(CPos("A1"), "10"));
     assert (x0.setCell(CPos("A2"), "20.5"));
     assert (x0.setCell(CPos("A3"), "3e1"));
@@ -124,6 +95,7 @@ int main() {
     assert (x0.setCell(CPos("B6"), "=B1+B2+B3+B4+B5"));
     assert (valueMatch(x0.getValue(CPos("B1")), CValue(625.0)));
     assert (valueMatch(x0.getValue(CPos("B2")), CValue(-110.25)));
+
     assert (valueMatch(x0.getValue(CPos("B3")), CValue(1024.0)));
     assert (valueMatch(x0.getValue(CPos("B4")), CValue(930.25)));
     assert (valueMatch(x0.getValue(CPos("B5")), CValue(2469.0)));
@@ -154,6 +126,7 @@ int main() {
     oss.str("");
     assert (x0.save(oss));
     data = oss.str();
+    std::cout << data << std::endl;
     iss.clear();
     iss.str(data);
     assert (x1.load(iss));

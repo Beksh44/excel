@@ -10,7 +10,10 @@
 	{
 		"commands" : 
 		[
-			"add_executable"
+			"add_executable",
+			"link_directories",
+			"target_link_libraries",
+			"target_include_directories"
 		],
 		"files" : 
 		[
@@ -24,7 +27,25 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 6,
+				"line" : 7,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 5,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 11,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 12,
 				"parent" : 0
 			}
 		]
@@ -36,6 +57,13 @@
 			[
 				{
 					"fragment" : "-g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -mmacosx-version-min=13.2 -fcolor-diagnostics"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 4,
+					"path" : "/Users/beksh/fit/pa2/omirzbek/excel"
 				}
 			],
 			"language" : "CXX",
@@ -65,6 +93,20 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-L/Users/beksh/fit/pa2/omirzbek/excel/arm64-darwin23-clang",
+				"role" : "libraryPath"
+			},
+			{
+				"fragment" : "-Wl,-rpath,/Users/beksh/fit/pa2/omirzbek/excel/arm64-darwin23-clang",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "-lexpression_parser",
+				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"
@@ -84,6 +126,13 @@
 			[
 				0
 			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1
+			]
 		}
 	],
 	"sources" : 
@@ -91,8 +140,13 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "main.cpp",
+			"path" : "result.cpp",
 			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "expression.h",
+			"sourceGroupIndex" : 1
 		}
 	],
 	"type" : "EXECUTABLE"
