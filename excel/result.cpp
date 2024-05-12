@@ -43,19 +43,65 @@ constexpr unsigned                     SPREADSHEET_SPEED                       =
 constexpr unsigned                     SPREADSHEET_PARSER                      = 0x10;
 #endif /* __PROGTEST__ */
 
+
+///////////////////////////////////////////////////////////////////////////////////CPos
+
 class CPos {
 public:
     CPos() = default;
     CPos ( std::string_view str );
+    /*
+     * Convert a string to an integer
+     * @param pos - string
+     * @param posInt - pair of integers
+     */
     void toInt ( const std::string & pos , std::pair<long long int , int> & posInt );
+    /*
+     * Convert integer to a string
+     * @param posInt - integer
+     * @return the string
+     */
     std::string toStr ( long long int posInt );
+    /*
+     * Get the position as a string
+     * @return the string
+     */
     std::string  getPosStr () const;
+    /*
+     * Get the position as an integer
+     * @return the integer
+     */
     std::pair<long long int , int> getPosInt () const;
+    /*
+     * Check if the column is fixed
+     * @return true if the column is fixed, false otherwise
+     */
     bool isFixedColumn() const;
+    /*
+     * Check if the row is fixed
+     * @return true if the row is fixed, false otherwise
+     */
     bool isFixedRow() const;
+    /*
+     * Set the fixed column
+     * @param toSet - true if the column should be fixed, false otherwise
+     */
     void setFixedColumn ( bool toSet );
+    /*
+     * Set the fixed row
+     * @param toSet - true if the row should be fixed, false otherwise
+     */
     void setFixedRow ( bool toSet );
+    /*
+     * Serialize the object
+     * @param out - output stream
+     */
     void serialize ( std::ostream & out ) const;
+    /*
+     * Deserialize the object
+     * @param in - input stream
+     * @return true if the object was deserialized, false otherwise
+     */
     bool deSerialize ( std::istream & in );
 
 private:
@@ -65,16 +111,25 @@ private:
     std::pair< long long int , int> m_int;
 };
 
+
+/*
+ * Convert a string to an integer
+ * @param pos - string
+ * @param posInt - pair of integers
+ */
+
 void CPos::toInt ( const std::string & pos , std::pair<long long int , int> & posInt ) {
     int size = pos.size();
     posInt.first = 0;
-    for ( int i = size - 1 , j = 0; i >= 0; i-- , j++ ) {
+    for ( int i = size - 1 , j = 0; i >= 0; i-- , j++ ) //convert the string to an integer
         posInt.first += ( ( pos [ j ] - 'A' + 1  ) * pow ( 26 , i ) );
-        std::cout << posInt.first << std::endl;
-    }
-
-    std::cout << "end" << std::endl;
 }
+
+/*
+ * Convert integer to a string
+ * @param posInt - integer
+ * @return the string
+ */
 
 std::string CPos ::toStr ( long long int posInt ) {
     std::string pos = "";
@@ -84,20 +139,24 @@ std::string CPos ::toStr ( long long int posInt ) {
         pos = digit + pos;
         posInt /= 26;
     }
-    //std::cout << "decoded : " << pos << std::endl;
     return pos;
 }
+
+/*
+ * Constructor
+ * @param str - string
+ */
 
 CPos::CPos ( std::string_view str ) {
 
     m_fixedColumn = false;
     m_fixedRow = false;
     auto it = str.begin();
-    if ( * it == '$') {
+    if ( * it == '$') {//if the column is fixed
         m_fixedColumn = true;
         it++;//skipping
     }
-    while ( std::isalpha ( *it ) ) {
+    while ( std::isalpha ( *it ) ) {//while it's a letter
         m_str.push_back ( ::toupper( *it ) );
         it++;
     }
@@ -105,49 +164,84 @@ CPos::CPos ( std::string_view str ) {
     if ( it == str.begin() || it == str.end() )
         throw std::invalid_argument ( "format of position isn't right" );//if we haven't moved from the beginning means that first element isn't a letter
 
-    toInt ( m_str , m_int );
+    toInt ( m_str , m_int );//convert the string to a pair of integers
     auto it2 = it;
-    if ( * it == '$' ) {
+    if ( * it == '$' ) {//if the row is fixed
         m_fixedRow = true;
         it++;
     }
 
     std::string tmp;
-    while ( std::isdigit ( *it ) && it != str.end() ) {
+    while ( std::isdigit ( *it ) && it != str.end() ) {//while it's a digit
         m_str.push_back( *it );
         tmp.push_back( * it );
         it++;
     }
-    m_int.second = std::stoi( tmp );
 
-   if ( it == it2 || it != str.end() )
-       throw std::invalid_argument ( "format of position isn't right" );//if we haven't moved from the beginning
+    m_int.second = std::stoi( tmp );//convert the row to an integer
+
+    if ( it == it2 || it != str.end() )
+        throw std::invalid_argument ( "format of position isn't right" );//if we haven't moved from the beginning
 
 }
+
+/*
+ * Get the position as a string
+ * @return the position as a string
+ */
 
 std::string CPos::getPosStr() const {
     return m_str;
 }
 
+/*
+ * Get the position as a pair of integers
+ * @return the position as a pair of integers
+ */
+
 std::pair<long long int , int> CPos::getPosInt() const {
     return m_int;
 }
+
+/*
+ * Check if the column is fixed
+ * @return true if the column is fixed, false otherwise
+ */
 
 bool CPos::isFixedColumn() const {
     return m_fixedColumn;
 }
 
+/*
+ * Check if the row is fixed
+ * @return true if the row is fixed, false otherwise
+ */
+
 bool CPos::isFixedRow() const {
     return m_fixedRow;
 }
 
+/*
+ * Set the fixed column
+ * @param toSet - true if the column should be fixed, false otherwise
+ */
 void CPos::setFixedColumn ( bool toSet ) {
     m_fixedColumn = toSet;
 }
 
+/*
+ * Set the fixed row
+ * @param toSet - true if the row should be fixed, false otherwise
+ */
+
 void CPos::setFixedRow ( bool toSet ) {
     m_fixedRow = toSet;
 }
+
+/*
+ * Serialize the object
+ * @param out - output stream
+ */
 
 void CPos::serialize ( std::ostream & out ) const {
     size_t size = m_str.size();
@@ -157,6 +251,12 @@ void CPos::serialize ( std::ostream & out ) const {
     out.write ( reinterpret_cast< const char * > ( & m_fixedRow ) , sizeof ( m_fixedRow ) );
     out.write ( reinterpret_cast< const char * > ( & m_int ) , sizeof ( m_int ) );
 }
+
+/*
+ * Deserialize the object
+ * @param in - input stream
+ * @return true if the object was successfully deserialized, false otherwise
+ */
 
 bool CPos::deSerialize ( std::istream & in ) {
     size_t size;
@@ -176,31 +276,59 @@ bool CPos::deSerialize ( std::istream & in ) {
         return false;
     return true;
 }
+//////////////////////////////////////////////////////////////////////////////CExpression
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//CValue with position for the getValue of child class CPosition
 using CValue2 = std::variant<std::monostate, double, std::string,CPos>;
 
 class CExpression {
 public:
     virtual std::shared_ptr<CExpression> clone() const = 0;
 
+
+    /*
+     * Print the expression
+     */
     virtual void print () const = 0;
 
+    /*
+     * Get the value of the expression
+     */
     virtual CValue2 getValue() = 0;
 
+    /*
+     * Check if the expression is a double
+     */
     virtual bool isDouble() const = 0;
 
+    /*
+     * Check if the expression is a string
+     */
     virtual bool isString() const = 0;
 
+    /*
+     * Check if the expression is a position
+     */
     virtual bool isPos() const = 0;
 
+    /*
+     * Check if the expression is an operator
+     */
     virtual bool isOperator() const = 0;
 
+    /*
+     * Serialize the expression
+     */
     virtual void serialize ( std::ostream& os ) const = 0;
 
+    /*
+     * Deserialize the expression
+     */
     virtual bool deSerialize ( std::istream& is ) = 0;
 
+    /*
+     * Get the type of the expression
+     */
     virtual std::string getType() const = 0;
 };
 
@@ -339,7 +467,7 @@ std::shared_ptr<CExpression> COperator::clone() const {
 }
 
 void COperator::print() const {
-    std::cout << " operator " << std::endl;
+    std::cout << "COperator" << std::endl;
 }
 
 CValue2 COperator::getValue() {
@@ -363,7 +491,7 @@ bool COperator::isString() const {
 }
 
 std::string COperator::getType() const {
-    return "CO";
+    return "COperator";
 }
 
 void COperator::serialize ( std::ostream & out ) const {
@@ -421,7 +549,7 @@ bool CDouble::isString() const {
 }
 
 std::string CDouble::getType() const {
-    return "CD";
+    return "CDouble";
 }
 
 void CDouble::serialize ( std::ostream& out ) const {
@@ -448,7 +576,7 @@ std::shared_ptr<CExpression> CString::clone() const {
 }
 
 void CString::print () const {
-    std::cout << "jo2" << std::endl;
+    std::cout << "CString" << std::endl;
 }
 
 CValue2 CString::getValue() {
@@ -472,7 +600,7 @@ bool CString::isOperator() const {
 }
 
 std::string CString::getType() const {
-    return "CS";
+    return "CString";
 }
 
 void CString::serialize ( std::ostream & out ) const {
@@ -506,7 +634,7 @@ std::shared_ptr<CExpression> CPosition::clone() const {
 }
 
 void CPosition::print () const {
-    std::cout << "jo3" << std::endl;
+    std::cout << "CPosition" << std::endl;
 }
 
 CValue2 CPosition::getValue() {
@@ -530,7 +658,7 @@ bool CPosition::isString() const {
 }
 
 std::string CPosition::getType() const {
-    return "CP";
+    return "CPosition";
 }
 
 void CPosition::serialize ( std::ostream & out ) const {
@@ -541,7 +669,7 @@ bool CPosition::deSerialize ( std::istream & in ) {
     return m_pos .deSerialize( in );
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////operator functions
 
 CValue add ( const CValue & left , const CValue & right ) {
     if ( std::holds_alternative<double>( left ) && std::holds_alternative<double> ( right ) )
@@ -693,15 +821,11 @@ CValue ge ( const CValue & left , const CValue & right ) {
     return std::monostate();
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////CMyBuilder
 
 class CMyBuilder : public CExprBuilder {
 private:
-//    CPos position;
-//    std::shared_ptr<std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>>> ptrToTable;
     std::shared_ptr<std::vector<std::shared_ptr<CExpression>>> ptrToPos;
-    std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> m_table;
     CPos m_pos;
 public:
 
@@ -740,23 +864,23 @@ public:
     void valRange ( std::string val ) override;
 
     void funcCall ( std::string fnName,
-                            int paramCount ) override;
+                    int paramCount ) override;
 
+    /*
+     * Set the pointer to the vector of expressions
+     */
     void setPtr ( std::shared_ptr<std::vector<std::shared_ptr<CExpression>>> & ptr );
 
-    void setTable ( std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> & data );
 };
 
 CMyBuilder::CMyBuilder() = default;
 
 void CMyBuilder::opAdd() {
-    std::cout << " + " << std::endl;
     COperator toPush ( "+" );
     ptrToPos ->emplace_back( toPush.clone() );
 }
 
 void CMyBuilder::opDiv() {
-    std::cout << " / " << std::endl;
     COperator toPush ( "/" );
     ptrToPos->emplace_back( toPush.clone() );
 }
@@ -767,15 +891,13 @@ void CMyBuilder::opEq() {
 }
 
 void CMyBuilder::opGe() {
-    COperator toPush ( ">=" ); // >=
+    COperator toPush ( ">=" );
     ptrToPos->emplace_back( toPush.clone() );
 }
 
 void CMyBuilder::valNumber ( double val ) {
-    //std::cout << " the number is " << val << std::endl;
     CDouble toPush ( val );
     ptrToPos->emplace_back ( toPush.clone() );
-    //std::cout << "tmp second is ";
 }
 
 void CMyBuilder::valString ( std::string val ) {
@@ -833,19 +955,22 @@ void CMyBuilder::setPtr ( std::shared_ptr<std::vector<std::shared_ptr<CExpressio
     ptrToPos = ptr;
 }
 
-void CMyBuilder::setTable ( std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> & data ) {
-    m_table = data;
-}
+void CMyBuilder::valRange ( std::string val ) {}
 
-void CMyBuilder::valRange ( std::string val ) {
-
-}
-
-void CMyBuilder::funcCall ( std::string fnName, int paramCount ) {
-
-}
+void CMyBuilder::funcCall ( std::string fnName, int paramCount ) {}
 
 ///////////////////////////////////////////////////////////////////////////////////recursive algorithm of dfs
+
+/**
+ *
+ * @param graph
+ * @param node
+ * @param visited
+ * @param currentlyVisiting
+ *
+ * @return true if there is a cycle
+ * This function is a recursive algorithm of depth first search
+ */
 
 bool dfs ( const std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> & graph ,
            const std::string & node,
@@ -857,7 +982,7 @@ bool dfs ( const std::unordered_map <std::string , std::vector<std::shared_ptr<C
 
 
     if ( visited.find ( node ) != visited.end() )
-         return false;
+        return false;
 
 
     visited.insert ( node );
@@ -961,8 +1086,6 @@ public:
 
     CValue getValue ( CPos pos );
 
-    //CSpreadsheet operator = ( CSpreadsheet & other );
-
     void copyRect ( CPos dst,
                     CPos src,
                     int w = 1,
@@ -971,14 +1094,17 @@ public:
 private:
     std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> m_data;
 };
+
+
+//////////////////////////////////////////////CSpreadsheet implementation
 CSpreadsheet::CSpreadsheet() = default;
 
 CSpreadsheet::CSpreadsheet ( const CSpreadsheet & other ) {
     for ( const auto & pair : other.m_data ) {
-         const std::string & key = pair.first;
-         for ( const auto & expr : pair.second ) {
+        const std::string & key = pair.first;
+        for ( const auto & expr : pair.second ) {
             m_data [ key ].push_back ( expr -> clone() );
-         }
+        }
     }
 }
 
@@ -987,7 +1113,6 @@ bool CSpreadsheet::setCell ( CPos pos , std::string contents ) {
     std::shared_ptr< std::vector<std::shared_ptr<CExpression>>> ptr = std::make_shared<std::vector<std::shared_ptr<CExpression>>>( m_data [ pos .getPosStr() ]);
     ptr->clear();
     tmp.setPtr ( ptr );
-    tmp.setTable ( m_data );
     parseExpression ( contents , tmp );
     m_data[ pos.getPosStr() ] = *ptr;
     return true;
@@ -1001,24 +1126,25 @@ CValue CSpreadsheet::getValue ( CPos pos ) {
 
     std::unordered_set < std::string > visited;
     std::unordered_set < std::string > currentlyVisiting;
-    if ( dfs ( m_data , pos.getPosStr() , visited, currentlyVisiting ) )
+    if ( dfs ( m_data , pos.getPosStr() , visited, currentlyVisiting ) )//if there is a cycle
         return std::monostate();
 
-    std::vector<std::shared_ptr<CExpression>> * expression = & m_data [ pos.getPosStr() ];
+    std::vector<std::shared_ptr<CExpression>> * expression = & m_data [ pos.getPosStr() ];//getting the value at this position
     std::stack<CValue> myStack;
-    CValue tmpVal;
-    for ( const auto & it : ( * expression ) ) {
-        if ( ( it ) -> isPos() ) {
-            if ( ! m_data.contains ( ( std::get< CPos >( it->getValue() ) ) .getPosStr() ) )
+    CValue tmpVal;//temporary value to push to the stack
+    for ( const auto & it : ( * expression ) ) {//going through the expression
+        if ( ( it ) -> isPos() ) {//if it is a position
+            if ( ! m_data.contains ( ( std::get< CPos >( it->getValue() ) ) .getPosStr() ) )//if there is nothing at this position
                 return std::monostate();
         }
-        if ( ( * it ).isOperator() ) {
+        if ( ( * it ).isOperator() ) {//if it is an operator
             std::string str = std::get<std::string>( ( * it ).getValue() );
             if ( str != "unar" ) {//if it is binary operator
                 CValue right = myStack.top();
                 myStack.pop();
                 CValue left = myStack.top();
                 myStack.pop();
+                //checking every possible operator
                 if ( str == "+" )
                     tmpVal = add ( left , right );
                 else if ( str == "-" )
@@ -1041,72 +1167,74 @@ CValue CSpreadsheet::getValue ( CPos pos ) {
                     tmpVal = gt ( left , right );
                 else if ( str == ">=" )
                     tmpVal = ge ( left , right );
-            } else {
+            } else {//if it is a unary operator
                 CValue value = myStack.top();
                 myStack.pop();
                 tmpVal = unaryMinus ( value );
             }
-        } else {
-            if ( ( * it ) . isPos() )
+        } else {//if it is not an operator
+            if ( ( * it ) . isPos() )//if it is a position
                 tmpVal = getValue ( std::get<CPos>( ( * it ).getValue() ) );
-            else {
+            else {//if it is a value(double or string)
                 if ( ( * it ) . isDouble() )
                     tmpVal = std::get<double> ( ( * it ) . getValue() );
                 else if ( ( * it ) . isString() )
                     tmpVal = std::get<std::string> ( ( * it ) . getValue() );
             }
         }
-        myStack.push ( tmpVal );
+        myStack.push ( tmpVal );//pushing the value to the stack
     }
-    return myStack.top();
+    return myStack.top();//returning the top of the stack which is the final value
 }
 
 void CSpreadsheet::copyRect ( CPos dst , CPos src , int w , int h ) {
-    long int diffWidth = dst.getPosInt().first - src.getPosInt().first;
-    int diffHeight = dst.getPosInt().second - src.getPosInt().second;
-    std::unordered_map< std::string , std::vector<std::shared_ptr<CExpression>>> tmpMap;
-    std::pair<long long int, int > offset = src.getPosInt();
-    for ( int i = 0; i < h; ++i ) {
-        for ( int j = 0; j < w; ++j ) {
+
+    long int diffWidth = dst.getPosInt().first - src.getPosInt().first;//difference in width
+    int diffHeight = dst.getPosInt().second - src.getPosInt().second;//difference in height
+
+    std::unordered_map< std::string , std::vector<std::shared_ptr<CExpression>>> tmpMap;//temporary map to store the values
+
+    for ( int i = 0; i < h; ++i ) {//going through the height
+        for ( int j = 0; j < w; ++j ) {//going through the width
             std::string tmpStr;
-            tmpStr = src.toStr ( offset.first + j ); // moving our position by width
-            tmpStr += std::to_string( offset.second + i );// moving our position by height
+            tmpStr = src.toStr ( src.getPosInt().first + j ); // moving our position by width
+            tmpStr += std::to_string( src.getPosInt().second + i );// moving our position by height
 
             if ( m_data.contains ( tmpStr ) ) {// if it's not a monostate
                 std::vector< std::shared_ptr< CExpression > > * value = & m_data [ tmpStr ];//getting the value in that position
                 std::vector< std::shared_ptr< CExpression > > toPush;
                 for ( const auto & it : ( * value ) ) {//going through the value or expression
-                    if ( it->isPos() ) {
-                        CPos pos2 = std::get<CPos>( (* it ) . getValue() );
+                    if ( it->isPos() ) {//if it is a position
+                        CPos pos2 = std::get<CPos>( (* it ) . getValue() );//getting the position
 
-                        tmpStr = pos2.toStr ( pos2.getPosInt().first + ( ( pos2.isFixedColumn() ) ? 0 : diffWidth ) );
-                        tmpStr += std::to_string ( pos2.getPosInt().second + ( ( pos2.isFixedRow() ) ? 0 : diffHeight ) );
+                        tmpStr = pos2.toStr ( pos2.getPosInt().first + ( ( pos2.isFixedColumn() ) ? 0 : diffWidth ) );//moving the position by width
+                        tmpStr += std::to_string ( pos2.getPosInt().second + ( ( pos2.isFixedRow() ) ? 0 : diffHeight ) );//moving the position by height
                         CPos tmpPos ( tmpStr );
 
-                        if ( pos2.isFixedColumn() )
+                        if ( pos2.isFixedColumn() )//if the column is fixed
                             tmpPos.setFixedColumn ( true );
-                        if ( pos2.isFixedRow() )
+                        if ( pos2.isFixedRow() )//if the row is fixed
                             tmpPos.setFixedRow ( true );
 
-                        CPosition posToPush ( tmpPos );
-                        toPush . emplace_back ( posToPush . clone() );
+                        CPosition posToPush ( tmpPos );//creating a new position to push
+                        toPush . emplace_back ( posToPush . clone() );//pushing the new position
                     } else {
-                        toPush . emplace_back ( it->clone() );
+                        toPush . emplace_back ( it->clone() );//pushing the value that is not a position
                     }
                 }
                 tmpStr = dst.toStr ( dst.getPosInt().first + j ); // moving our position by width
                 tmpStr += std::to_string( dst.getPosInt().second + i );//adding position in columns
-                tmpMap [ tmpStr ] = toPush;
+                tmpMap [ tmpStr ] = toPush;//pushing the value to the map
             }
         }
     }
 
-    for ( const auto & it : tmpMap ) {
+    for ( const auto & it : tmpMap ) {//going through the map
         if ( ! m_data.contains( it.first ) )
-            m_data [ it.first ] = it.second;
+            m_data [ it.first ] = it.second;//if the position is not in the map, add it
         else {
-            m_data . erase( it.first );
-            m_data [ it.first ] = it.second;
+            m_data . erase( it.first );//if the position is in the map, erase it
+            m_data [ it.first ] = it.second;//add the new value
         }
     }
 }
@@ -1114,7 +1242,7 @@ void CSpreadsheet::copyRect ( CPos dst , CPos src , int w , int h ) {
 bool CSpreadsheet::save ( std::ostream & os ) const {
     int size = m_data.size();
     os.write ( reinterpret_cast < const char * > ( & size ), sizeof ( size ) );
-    for (const auto& pair : m_data) {
+    for ( const auto& pair : m_data ) {
 
         serializeString(os, pair.first);// Write position to stream
 
@@ -1153,22 +1281,22 @@ bool CSpreadsheet::load(std::istream& is) {
                 return false; // Error reading expression type
             }
             // Create expression based on type
-            if (exprType == "CD") {
+            if ( exprType == "CDouble" ) {//if it is a double
                 CDouble tmp;
                 if ( ! tmp.deSerialize ( is ) )
                     return false;
                 m_data[position][i] = std::make_shared<CDouble> ( tmp );
-            } else if (exprType == "CS") {
+            } else if ( exprType == "CString" ) {//if it is a string
                 CString tmp;
                 if ( ! tmp.deSerialize ( is ) )
                     return false;
                 m_data[position][i] = std::make_shared<CString> ( tmp );
-            } else if (exprType == "CP") {
+            } else if ( exprType == "CPosition" ) {//if it is a position
                 CPosition tmp;
                 if ( ! tmp.deSerialize ( is ) )
                     return false;
                 m_data[position][i] = std::make_shared<CPosition> ( tmp );
-            } else if ( exprType == "CO") {
+            } else if ( exprType == "COperator" ) {//if it is an operator
                 COperator tmp;
                 if ( ! tmp.deSerialize ( is ) )
                     return false;
