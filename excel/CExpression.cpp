@@ -14,7 +14,7 @@ std::shared_ptr<CExpression> COperator::clone() const {
 }
 
 void COperator::print() const {
-    std::cout << " operator " << std::endl;
+    std::cout << "COperator" << std::endl;
 }
 
 CValue2 COperator::getValue() {
@@ -34,10 +34,6 @@ bool COperator::isPos() const {
 }
 
 bool COperator::isString() const {
-    return false;
-}
-
-bool COperator::isMonostate() const {
     return false;
 }
 
@@ -99,10 +95,6 @@ bool CDouble::isString() const {
     return false;
 }
 
-bool CDouble::isMonostate() const {
-    return false;
-}
-
 std::string CDouble::getType() const {
     return "CDouble";
 }
@@ -131,7 +123,7 @@ std::shared_ptr<CExpression> CString::clone() const {
 }
 
 void CString::print () const {
-    std::cout << "jo2" << std::endl;
+    std::cout << "CString" << std::endl;
 }
 
 CValue2 CString::getValue() {
@@ -151,10 +143,6 @@ bool CString::isDouble() const {
 }
 
 bool CString::isOperator() const {
-    return false;
-}
-
-bool CString::isMonostate() const {
     return false;
 }
 
@@ -193,7 +181,7 @@ std::shared_ptr<CExpression> CPosition::clone() const {
 }
 
 void CPosition::print () const {
-    std::cout << "jo3" << std::endl;
+    std::cout << "CPosition" << std::endl;
 }
 
 CValue2 CPosition::getValue() {
@@ -214,10 +202,6 @@ bool CPosition::isOperator() const {
 
 bool CPosition::isString() const {
     return false;
-}
-
-bool CPosition::isMonostate() const {
-
 }
 
 std::string CPosition::getType() const {
