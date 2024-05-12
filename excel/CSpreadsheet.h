@@ -25,7 +25,7 @@ using CValue = std::variant<std::monostate, double, std::string>;
 class CSpreadsheet {
 public:
     static unsigned capabilities() {
-        return SPREADSHEET_CYCLIC_DEPS | SPREADSHEET_FUNCTIONS | SPREADSHEET_FILE_IO | SPREADSHEET_SPEED ;
+        return SPREADSHEET_CYCLIC_DEPS | SPREADSHEET_FUNCTIONS | SPREADSHEET_FILE_IO | SPREADSHEET_SPEED;
         // | SPREADSHEET_PARSER
     }
 
