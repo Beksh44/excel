@@ -11,55 +11,52 @@
 
 class CMyBuilder : public CExprBuilder {
 private:
-//    CPos position;
-//    std::shared_ptr<std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>>> ptrToTable;
     std::shared_ptr<std::vector<std::shared_ptr<CExpression>>> ptrToPos;
-    std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> m_table;
     CPos m_pos;
 public:
 
     CMyBuilder();
 
-    virtual void opAdd() override;
+    void opAdd() override;
 
-    virtual void opSub() override;
+    void opSub() override;
 
-    virtual void opMul() override;
+    void opMul() override;
 
-    virtual void opDiv() override;
+    void opDiv() override;
 
-    virtual void opPow() override;
+    void opPow() override;
 
-    virtual void opNeg() override;
+    void opNeg() override;
 
-    virtual void opEq() override;
+    void opEq() override;
 
-    virtual void opNe() override;
+    void opNe() override;
 
-    virtual void opLt() override;
+    void opLt() override;
 
-    virtual void opLe() override;
+    void opLe() override;
 
-    virtual void opGt() override;
+    void opGt() override;
 
-    virtual void opGe() override;
+    void opGe() override;
 
-    virtual void valNumber ( double val ) override;
+    void valNumber ( double val ) override;
 
-    virtual void valString ( std::string val ) override;
+    void valString ( std::string val ) override;
 
-    virtual void valReference ( std::string val ) override;
+    void valReference ( std::string val ) override;
 
-    virtual void valRange ( std::string val ) override;
+    void valRange ( std::string val ) override;
 
-    virtual void funcCall ( std::string fnName,
-                            int paramCount ) override;
+    void funcCall ( std::string fnName,
+                    int paramCount ) override;
 
-    void printDOuble ();
-
+    /*
+     * Set the pointer to the vector of expressions
+     */
     void setPtr ( std::shared_ptr<std::vector<std::shared_ptr<CExpression>>> & ptr );
 
-    void setTable ( std::unordered_map <std::string , std::vector<std::shared_ptr<CExpression>>> & data );
 };
 
 
