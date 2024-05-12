@@ -39,8 +39,6 @@ using namespace std::literals;
 using CValue = std::variant<std::monostate, double, std::string>;
 #endif /* __PROGTEST__ */
 
-
-
 #include "CSpreadsheet.h"
 
 
@@ -95,7 +93,6 @@ int main() {
     assert (x0.setCell(CPos("B6"), "=B1+B2+B3+B4+B5"));
     assert (valueMatch(x0.getValue(CPos("B1")), CValue(625.0)));
     assert (valueMatch(x0.getValue(CPos("B2")), CValue(-110.25)));
-
     assert (valueMatch(x0.getValue(CPos("B3")), CValue(1024.0)));
     assert (valueMatch(x0.getValue(CPos("B4")), CValue(930.25)));
     assert (valueMatch(x0.getValue(CPos("B5")), CValue(2469.0)));
@@ -126,7 +123,6 @@ int main() {
     oss.str("");
     assert (x0.save(oss));
     data = oss.str();
-    std::cout << data << std::endl;
     iss.clear();
     iss.str(data);
     assert (x1.load(iss));
